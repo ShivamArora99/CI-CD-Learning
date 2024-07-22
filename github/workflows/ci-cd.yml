@@ -1,0 +1,40 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        pip install requests
+        pip install python-dotenv
+
+    - name: Add .env file
+      run: |
+        echo "OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}" > .env
+
+    - name: Extract Data
+      run: python process_data.py
+
+    - name: Process Data
+      run:  python process_data.py
+
+    - name: Upload processed data
+      uses: action/upload-artificat@v2
+      with:
+        name: processed-data
+        path: data/processed_weather_data.json
